@@ -1,0 +1,19 @@
+[package]
+name = "rotary-encoder-hal"
+version = "0.1.0"
+authors = ["Evan Cameron <cameron.evan@gmail.com>"]
+edition = "2018"
+description = "A simple platform agnostic rotary encoder library using embedded_hal"
+keywords = ["embedded-hal", "driver", "rotary", "encoder"]
+categories = ["embedded", "hardware-support", "no-std"]
+license = "MIT"
+readme = "README.md"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+embedded-hal = { version = "0.2.3", features = ["unproven"] }
+either = { version = "1.5.3", default-features = false }
+
+[dev-dependencies]
+version-sync = "0.8"
