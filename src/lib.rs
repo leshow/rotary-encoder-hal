@@ -65,8 +65,6 @@
 #![deny(warnings)]
 #![no_std]
 
-extern crate embedded_hal;
-
 use either::Either;
 use embedded_hal as hal;
 use hal::digital::v2::InputPin;
