@@ -5,12 +5,61 @@
 //!
 //! Built using [`embedded-hal`] traits
 //!
+//!
+//! # Example
+//!
+//! ```rust
+//! #![no_std]
+//! #![no_main]
+//!
+//! extern crate panic_itm;
+//!
+//! use cortex_m_rt::entry;
+//! use hal::{delay::Delay, prelude::*, stm32};
+//! use stm32f3xx_hal as hal;
+//!
+//! use rotary_encoder_hal::{Direction, Rotary};
+//!
+//! #[entry]
+//! fn main() -> ! {
+//!     let cp = cortex_m::Peripherals::take().unwrap();
+//!     let peripherals = stm32::Peripherals::take().unwrap();
+//!
+//!     let mut flash = peripherals.FLASH.constrain();
+//!     let mut rcc = peripherals.RCC.constrain();
+//!
+//!     let clocks = rcc.cfgr.freeze(&mut flash.acr);
+//!
+//!     let mut delay = Delay::new(cp.SYST, clocks);
+//!
+//!     let mut gpiob = peripherals.GPIOB.split(&mut rcc.ahb);
+//!     let pin_a = gpiob
+//!         .pb10
+//!         .into_pull_up_input(&mut gpiob.moder, &mut gpiob.pupdr);
+//!     let pin_b = gpiob
+//!         .pb11
+//!         .into_pull_up_input(&mut gpiob.moder, &mut gpiob.pupdr);
+//!
+//!     let mut enc = Rotary::new(pin_a, pin_b);
+//!     let mut pos: isize = 0;
+//!
+//!     loop {
+//!         match enc.update().unwrap() {
+//!             Direction::Clockwise => {
+//!                 pos += 1;
+//!             }
+//!             Direction::CounterClockwise => {
+//!                 pos -= 1;
+//!             }
+//!             Direction::None => {}
+//!         }
+//!     }
+//! }
+//! ```
+//!
+//! Alternatively, you can call `update` from an ISR.!
+//!
 //! [`embedded-hal`]: https://docs.rs/embedded-hal/0.2
-//!
-//! # Examples
-//!
-//!
-//! [rotary_encoder_hal]: https://docs.rs/rotary-encoder-hal/0.1.0
 
 #![deny(missing_docs)]
 #![deny(warnings)]
@@ -23,7 +72,6 @@ use embedded_hal as hal;
 use hal::digital::v2::InputPin;
 
 /// Holds current/old state and both [`InputPin`]s
-///
 /// [InputPin]: https://docs.rs/embedded-hal/0.2.3/embedded_hal/digital/v2/trait.InputPin.html
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Rotary<A, B> {
@@ -33,7 +81,6 @@ pub struct Rotary<A, B> {
 }
 
 /// The encoder direction is either [`Clockwise`], [`CounterClockwise`], or [`None`]
-///
 /// [`Clockwise`]: (enum.Direction.html)
 /// [`CounterClockwise`]: (enum.Direction.html)
 /// [`None`]: (enum.Direction.html)
@@ -62,8 +109,8 @@ where
     A: InputPin,
     B: InputPin,
 {
-    /// Accepts two `InputPin`s, in my testing, works best with both pins set to
-    /// pull-up.
+    /// Accepts two `InputPin`s, these will be read on every `update()`
+    /// [InputPin]: https://docs.rs/embedded-hal/0.2.3/embedded_hal/digital/v2/trait.InputPin.html
     pub fn new(pin_a: A, pin_b: B) -> Self {
         Self {
             pin_a,
@@ -71,7 +118,7 @@ where
             state: 0u8,
         }
     }
-    /// Call `update` to evaluate the next state of the encoder
+    /// Call `update` to evaluate the next state of the encoder, propagates errors from `InputPin` read
     pub fn update(&mut self) -> Result<Direction, Either<A::Error, B::Error>> {
         // use mask to get previous state value
         let mut s = self.state & 0b11;
@@ -85,13 +132,5 @@ where
         // move new state in
         self.state = s >> 2;
         Ok(s.into())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
     }
 }

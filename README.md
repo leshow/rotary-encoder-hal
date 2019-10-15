@@ -50,3 +50,5 @@ fn main() -> ! {
     }
 }
 ```
+
+Alternatively, you can call `update` from an ISR.
