@@ -8,9 +8,7 @@ A simple, platform agnostic rotary encoder library.
 
 extern crate panic_itm;
 
-use cortex_m::iprintln;
-use cortex_m_rt::{entry, exception, ExceptionFrame};
-use cortex_m_semihosting::{hio, hprintln};
+use cortex_m_rt::entry;
 use hal::{delay::Delay, prelude::*, stm32};
 use stm32f3xx_hal as hal;
 
