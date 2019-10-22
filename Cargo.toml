@@ -15,3 +15,6 @@ either = { version = "1.5.3", default-features = false }
 
 [dev-dependencies]
 version-sync = "0.8"
+
+[badges]
+travis-ci = { repository = "leshow/rotary-encoder-hal", branch = "master", service = "github" }
