@@ -15,6 +15,12 @@ either = { version = "1.5.3", default-features = false }
 
 [dev-dependencies]
 version-sync = "0.8"
+cortex-m = "0.6.1"
+cortex-m-rt = "0.6.10"
+
+[dev-dependencies.stm32f3xx-hal]
+version = "0.3.0"
+features = ["rt"]
 
 [badges]
 travis-ci = { repository = "leshow/rotary-encoder-hal", branch = "master", service = "github" }
