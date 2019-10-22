@@ -9,7 +9,7 @@ A simple, platform agnostic rotary encoder library.
 #![no_std]
 #![no_main]
 
-extern crate panic_itm;
+extern crate panic_semihosting;
 
 use cortex_m_rt::entry;
 use hal::{delay::Delay, prelude::*, stm32};

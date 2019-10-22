@@ -1,65 +1,9 @@
-#![doc(html_root_url = "https://docs.rs/rotary-encoder-hal/0.1.0")]
+#![doc(html_root_url = "https://docs.rs/rotary-encoder-hal/0.2.1")]
 //! # rotary-encoder-hal
 //!
 //! A platform agnostic rotary encoder library
 //!
 //! Built using [`embedded-hal`] traits
-//!
-//!
-//! # Example
-//!
-//! ```rust
-//! #![no_std]
-//! #![no_main]
-//!
-//! extern crate panic_itm;
-//!
-//! use cortex_m_rt::entry;
-//! use hal::{delay::Delay, prelude::*, stm32};
-//! use stm32f3xx_hal as hal;
-//!
-//! use rotary_encoder_hal::{Direction, Rotary};
-//!
-//! #[entry]
-//! fn main() -> ! {
-//!     // necessary preamble:
-//!     let cp = cortex_m::Peripherals::take().unwrap();
-//!     let peripherals = stm32::Peripherals::take().unwrap();
-//!
-//!     let mut flash = peripherals.FLASH.constrain();
-//!     let mut rcc = peripherals.RCC.constrain();
-//!
-//!     let clocks = rcc.cfgr.freeze(&mut flash.acr);
-//!
-//!     let mut delay = Delay::new(cp.SYST, clocks);
-//!
-//!     let mut gpiob = peripherals.GPIOB.split(&mut rcc.ahb);
-//!     let pin_a = gpiob
-//!         .pb10
-//!         .into_pull_up_input(&mut gpiob.moder, &mut gpiob.pupdr);
-//!     let pin_b = gpiob
-//!         .pb11
-//!         .into_pull_up_input(&mut gpiob.moder, &mut gpiob.pupdr);
-//!
-//!     // relevant parts:
-//!     let mut enc = Rotary::new(pin_a, pin_b);
-//!     let mut pos: isize = 0;
-//!
-//!     loop {
-//!         match enc.update().unwrap() {
-//!             Direction::Clockwise => {
-//!                 pos += 1;
-//!             }
-//!             Direction::CounterClockwise => {
-//!                 pos -= 1;
-//!             }
-//!             Direction::None => {}
-//!         }
-//!     }
-//! }
-//! ```
-//!
-//! Alternatively, you can call `update` from an ISR!
 //!
 //! [`embedded-hal`]: https://docs.rs/embedded-hal/0.2
 
