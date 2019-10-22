@@ -1,6 +1,5 @@
 # rotary-encoder-hal
 
-[![Build Status](https://travis-ci.com/leshow/rotary-encoder-hal.svg?branch=master)](https://travis-ci.com/leshow/rotary-encoder-hal?branch=master)
 [![Crate](https://img.shields.io/crates/v/rotary-encoder-hal.svg)](https://crates.io/crates/rotary-encoder-hal)
 [![API](https://docs.rs/rotary-encoder-hal/badge.svg)](https://docs.rs/rotary-encoder-hal)
 
