@@ -22,5 +22,7 @@ cortex-m-rt = "0.6.10"
 version = "0.3.0"
 features = ["rt"]
 
-[badges]
-travis-ci = { repository = "leshow/rotary-encoder-hal", branch = "master", service = "github" }
+[badges.travis-ci]
+repository = "leshow/rotary-encoder-hal"
+branch = "master"
+service = "github"
