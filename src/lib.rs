@@ -22,6 +22,7 @@
 //!
 //! #[entry]
 //! fn main() -> ! {
+//!     // necessary preamble:
 //!     let cp = cortex_m::Peripherals::take().unwrap();
 //!     let peripherals = stm32::Peripherals::take().unwrap();
 //!
@@ -40,6 +41,7 @@
 //!         .pb11
 //!         .into_pull_up_input(&mut gpiob.moder, &mut gpiob.pupdr);
 //!
+//!     // relevant parts:
 //!     let mut enc = Rotary::new(pin_a, pin_b);
 //!     let mut pos: isize = 0;
 //!
@@ -57,7 +59,7 @@
 //! }
 //! ```
 //!
-//! Alternatively, you can call `update` from an ISR.!
+//! Alternatively, you can call `update` from an ISR!
 //!
 //! [`embedded-hal`]: https://docs.rs/embedded-hal/0.2
 
@@ -69,8 +71,7 @@ use either::Either;
 use embedded_hal as hal;
 use hal::digital::v2::InputPin;
 
-/// Holds current/old state and both [`InputPin`]s
-/// [InputPin]: https://docs.rs/embedded-hal/0.2.3/embedded_hal/digital/v2/trait.InputPin.html
+/// Holds current/old state and both [`InputPin`](https://docs.rs/embedded-hal/0.2.3/embedded_hal/digital/v2/trait.InputPin.html)
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Rotary<A, B> {
     pin_a: A,
@@ -78,10 +79,7 @@ pub struct Rotary<A, B> {
     state: u8,
 }
 
-/// The encoder direction is either [`Clockwise`], [`CounterClockwise`], or [`None`]
-/// [`Clockwise`]: (enum.Direction.html)
-/// [`CounterClockwise`]: (enum.Direction.html)
-/// [`None`]: (enum.Direction.html)
+/// The encoder direction is either `Clockwise`, `CounterClockwise`, or `None`
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Direction {
     /// A clockwise turn
