@@ -15,10 +15,14 @@ either = { version = "1.5.3", default-features = false }
 
 [dev-dependencies]
 version-sync = "0.8"
-cortex-m = "0.6.1"
-cortex-m-rt = "0.6.10"
+cortex-m = "0.6.2"
+cortex-m-rt = "0.6.12"
 panic-semihosting = "0.5.3"
 
 [dev-dependencies.stm32f3xx-hal]
-version = "0.3.0"
+version = "0.4.1"
 features = [ "rt", "stm32f303" ]
+
+[features]
+default = []
+table-decoder = []

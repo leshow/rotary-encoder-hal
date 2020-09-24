@@ -58,6 +58,8 @@ where
             state: 0u8,
         }
     }
+
+    #[cfg(not(feature = "table-decoder"))]
     /// Call `update` to evaluate the next state of the encoder, propagates errors from `InputPin` read
     pub fn update(&mut self) -> Result<Direction, Either<A::Error, B::Error>> {
         // use mask to get previous state value
@@ -73,4 +75,9 @@ where
         self.state = s >> 2;
         Ok(s.into())
     }
+
+
+    #[cfg(feature = "table-decoder")]
+    pub fn update(&mut self) -> Result<Direction, Either<A::Error, B::Error>> {
+    } 
 }
