@@ -11,16 +11,16 @@ readme = "README.md"
 
 [dependencies]
 embedded-hal = { version = "0.2.3", features = ["unproven"] }
-either = { version = "1.5.3", default-features = false }
+either = { version = "1.6.1", default-features = false }
 
 [dev-dependencies]
-version-sync = "0.8"
-cortex-m = "0.6.2"
-cortex-m-rt = "0.6.12"
+version-sync = "0.9.1"
+cortex-m = "0.6.3"
+cortex-m-rt = "0.6.13"
 panic-semihosting = "0.5.3"
 
 [dev-dependencies.stm32f3xx-hal]
-version = "0.4.1"
+version = "0.5.0"
 features = [ "rt", "stm32f303" ]
 
 [features]
