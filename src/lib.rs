@@ -21,6 +21,11 @@ pub struct Rotary<A, B> {
     pin_a: A,
     pin_b: B,
     state: u8,
+
+    #[cfg(feature = "table-decoder")]
+    prev_next: u8,
+    #[cfg(feature = "table-decoder")]
+    store: u16,
 }
 
 /// The encoder direction is either `Clockwise`, `CounterClockwise`, or `None`
@@ -34,6 +39,7 @@ pub enum Direction {
     None,
 }
 
+#[cfg(not(feature = "table-decoder"))]
 impl From<u8> for Direction {
     fn from(s: u8) -> Self {
         match s {
@@ -56,6 +62,11 @@ where
             pin_a,
             pin_b,
             state: 0u8,
+
+            #[cfg(feature = "table-decoder")]
+            prev_next: 0u8,
+            #[cfg(feature = "table-decoder")]
+            store: 0u16,
         }
     }
 
@@ -78,6 +89,35 @@ where
 
 
     #[cfg(feature = "table-decoder")]
+    /// Call `update` to evaluate the next state of the encoder, propagates errors from `InputPin` read
     pub fn update(&mut self) -> Result<Direction, Either<A::Error, B::Error>> {
+        // Implemented after https://www.best-microcontroller-projects.com/rotary-encoder.html
+        self.prev_next <<= 2;
+        if self.pin_a.is_high().map_err(Either::Left)? {
+            self.prev_next |= 0x02;
+        }
+        if self.pin_b.is_high().map_err(Either::Right)? {
+            self.prev_next |= 0x01;
+        }
+        self.prev_next &= 0x0f;
+
+        match self.prev_next {
+           /*Invalid cases 0 | 3 | 5 | 6 | 9 | 10 | 12 | 15=>, */
+           /*valid cases*/ 1 | 2 | 4 | 7 | 8 | 11 | 13 | 14 => {
+               self.store <<= 4;
+               self.store |= self.prev_next as u16;
+
+               if self.store & 0xff == 0x17 {
+                if self.prev_next == 0x0b {
+                    return Ok(Direction::Clockwise)
+                } else if self.prev_next == 0x07 {
+                    return Ok(Direction::CounterClockwise)
+                }
+               }
+           },
+           _ => return Ok(Direction::None)
+        }
+
+        Ok(Direction::None)
     } 
 }
