@@ -50,6 +50,17 @@ impl From<u8> for Direction {
     }
 }
 
+#[cfg(feature = "table-decoder")]
+impl From<u16> for Direction {
+    fn from(s: u16) -> Self {
+        match s & 0x00ff {
+            0x17 => Direction::Clockwise,
+            0x2b => Direction::CounterClockwise,
+            _ => Direction::None,
+        }
+    }
+}
+
 impl<A, B> Rotary<A, B>
 where
     A: InputPin,
@@ -87,7 +98,6 @@ where
         Ok(s.into())
     }
 
-
     #[cfg(feature = "table-decoder")]
     /// Call `update` to evaluate the next state of the encoder, propagates errors from `InputPin` read
     pub fn update(&mut self) -> Result<Direction, Either<A::Error, B::Error>> {
@@ -102,22 +112,15 @@ where
         self.prev_next &= 0x0f;
 
         match self.prev_next {
-           /*Invalid cases 0 | 3 | 5 | 6 | 9 | 10 | 12 | 15=>, */
-           /*valid cases*/ 1 | 2 | 4 | 7 | 8 | 11 | 13 | 14 => {
-               self.store <<= 4;
-               self.store |= self.prev_next as u16;
+            /*Invalid cases 0 | 3 | 5 | 6 | 9 | 10 | 12 | 15=>, */
+            /*valid cases*/
+            1 | 2 | 4 | 7 | 8 | 11 | 13 | 14 => {
+                self.store <<= 4;
+                self.store |= self.prev_next as u16;
 
-               if self.store & 0xff == 0x17 {
-                if self.prev_next == 0x0b {
-                    return Ok(Direction::Clockwise)
-                } else if self.prev_next == 0x07 {
-                    return Ok(Direction::CounterClockwise)
-                }
-               }
-           },
-           _ => return Ok(Direction::None)
+                Ok(self.store.into())
+            }
+            _ => Ok(Direction::None),
         }
-
-        Ok(Direction::None)
-    } 
+    }
 }
