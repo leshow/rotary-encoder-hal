@@ -10,14 +10,15 @@ license = "MIT"
 readme = "README.md"
 
 [dependencies]
-embedded-hal = { version = "0.2.4", features = ["unproven"] }
-either = { version = "1.6.1", default-features = false }
+embedded-hal = { version = "0.2", features = ["unproven"] }
+either = { version = "1.6", default-features = false }
 
 [dev-dependencies]
-version-sync = "0.9.1"
-cortex-m = "0.6.3"
-cortex-m-rt = "0.6.13"
-panic-semihosting = "0.5.3"
+version-sync = "0.9"
+cortex-m = "0.6"
+cortex-m-rt = "0.6"
+panic-semihosting = "0.5"
+cortex-m-semihosting = "0.3"
 
 [dev-dependencies.stm32f3xx-hal]
 version = "0.5.0"
