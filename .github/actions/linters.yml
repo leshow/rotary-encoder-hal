@@ -1,0 +1,66 @@
+name: Linters
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        toolchain: [stable, beta, nightly]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{matrix.toolchain}}
+          override: true
+
+      - name: Run cargo build
+        run: cargo build -v
+
+  rustfmt:
+    name: rustfmt
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        toolchain: [stable, beta, nightly]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{matrix.toolchain}}
+          override: true
+          components: rustfmt
+
+      - name: Run rustfmt
+        run: cargo fmt -v --check
+
+  clippy:
+    name: clippy
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        toolchain: [stable, beta, nightly]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{matrix.toolchain}}
+          override: true
+          components: clippy
+
+      - name: Run clippy
+        run: cargo clippy -- -D warnings

@@ -1,0 +1,26 @@
+name: Cross-compile & test
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latset
+
+    strategy:
+      matrix:
+        arch:
+          - thumbv6m-none-eabi
+          - thumbv7m-none-eabi
+          - thumbv7em-none-eabi
+          - thumbv7em-none-eabihf
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install docker and start its service
+        run: sudo apt install -y -v docker && sudo systemctl start docker
+
+      - name: Install cross
+        run: cargo install cross
+
+      - name: Crosstset
+        run: cross test --target ${{matrix.arch}}
