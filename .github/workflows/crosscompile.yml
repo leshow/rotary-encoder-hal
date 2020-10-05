@@ -1,0 +1,33 @@
+name: Cross-compile
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: crosscompile
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        arch:
+          - thumbv6m-none-eabi
+          - thumbv7m-none-eabi
+          - thumbv7em-none-eabi
+          - thumbv7em-none-eabihf
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install nightly toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+
+      - name: Install docker and start its service
+        run: sudo apt install -y -v docker && sudo systemctl start docker
+
+      - name: Install cross
+        run: cargo install cross
+
+      - name: Crosscompile
+        run: cross build --target ${{matrix.arch}}
