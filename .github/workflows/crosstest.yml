@@ -17,11 +17,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Install nightly toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+
       - name: Install docker and start its service
         run: sudo apt install -y -v docker && sudo systemctl start docker
 
       - name: Install cross
         run: cargo install cross
 
-      - name: Crosstset
+      - name: Crosstest
         run: cross test --target ${{matrix.arch}}
