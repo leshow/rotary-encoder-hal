@@ -1,4 +1,4 @@
-name: Cross-compile & test
+name: Cross-compile
 on: [push, pull_request]
 
 jobs:
@@ -29,5 +29,5 @@ jobs:
       - name: Install cross
         run: cargo install cross
 
-      - name: Crosstest
-        run: cross test --target ${{matrix.arch}}
+      - name: Crosscompile
+        run: cross build --target ${{matrix.arch}}
