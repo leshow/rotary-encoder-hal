@@ -18,6 +18,11 @@ either = { version = "1.6", default-features = false }
 version  = "0.1.2"
 optional = true
 
+[dependencies.embedded-hal-alpha]
+package  = "embedded-hal"
+version  = "=1.0.0-alpha.4"
+optional = true
+
 [dev-dependencies]
 version-sync = "0.9"
 cortex-m = "0.6"
