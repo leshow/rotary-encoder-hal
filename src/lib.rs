@@ -98,6 +98,16 @@ where
         Ok(s.into())
     }
 
+    /// Returns a reference to the first pin. Can be used to clear interrupt.
+    pub fn pin_a(&mut self) -> &mut A {
+        &mut self.pin_a
+    }
+
+    /// Returns a reference to the second pin. Can be used to clear interrupt.
+    pub fn pin_b(&mut self) -> &mut B {
+        &mut self.pin_b
+    }
+
     #[cfg(feature = "table-decoder")]
     /// Call `update` to evaluate the next state of the encoder, propagates errors from `InputPin` read
     pub fn update(&mut self) -> Result<Direction, Either<A::Error, B::Error>> {
