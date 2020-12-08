@@ -8,6 +8,7 @@ keywords = ["embedded-hal", "driver", "rotary", "encoder"]
 categories = ["embedded", "hardware-support", "no-std"]
 license = "MIT"
 readme = "README.md"
+repository = "https://github.com/leshow/rotary-encoder-hal"
 
 [dependencies]
 embedded-hal = { version = "0.2", features = ["unproven"] }
