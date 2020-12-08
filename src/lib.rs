@@ -17,6 +17,7 @@ use hal::digital::v2::InputPin;
 
 /// Holds current/old state and both [`InputPin`](https://docs.rs/embedded-hal/0.2.3/embedded_hal/digital/v2/trait.InputPin.html)
 #[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Rotary<A, B> {
     pin_a: A,
     pin_b: B,
@@ -30,6 +31,7 @@ pub struct Rotary<A, B> {
 
 /// The encoder direction is either `Clockwise`, `CounterClockwise`, or `None`
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Direction {
     /// A clockwise turn
     Clockwise,
