@@ -68,8 +68,7 @@ where
     A: InputPin,
     B: InputPin,
 {
-    /// Accepts two `InputPin`s, these will be read on every `update()`
-    /// [InputPin]: https://docs.rs/embedded-hal/0.2.3/embedded_hal/digital/v2/trait.InputPin.html
+    /// Accepts two [`InputPin`](https://docs.rs/embedded-hal/0.2.3/embedded_hal/digital/v2/trait.InputPin.html)s, these will be read on every `update()`
     pub fn new(pin_a: A, pin_b: B) -> Self {
         Self {
             pin_a,
