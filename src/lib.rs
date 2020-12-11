@@ -12,8 +12,12 @@
 #![no_std]
 
 use either::Either;
-use embedded_hal as hal;
-use hal::digital::v2::InputPin;
+
+#[cfg(not(feature = "embedded-hal-alpha"))]
+use embedded_hal::digital::v2::InputPin;
+
+#[cfg(feature = "embedded-hal-alpha")]
+use embedded_hal_alpha::digital::InputPin;
 
 /// Holds current/old state and both [`InputPin`](https://docs.rs/embedded-hal/0.2.3/embedded_hal/digital/v2/trait.InputPin.html)
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -87,11 +91,17 @@ where
     pub fn update(&mut self) -> Result<Direction, Either<A::Error, B::Error>> {
         // use mask to get previous state value
         let mut s = self.state & 0b11;
+
+        #[cfg(not(feature = "embedded-hal-alpha"))]
+        let (a_is_low, b_is_low) = (self.pin_a.is_low(), self.pin_b.is_low());
+        #[cfg(feature = "embedded-hal-alpha")]
+        let (a_is_low, b_is_low) = (self.pin_a.try_is_low(), self.pin_b.try_is_low());
+
         // move in the new state
-        if self.pin_a.is_low().map_err(Either::Left)? {
+        if a_is_low.map_err(Either::Left)? {
             s |= 0b100;
         }
-        if self.pin_b.is_low().map_err(Either::Right)? {
+        if b_is_low.map_err(Either::Right)? {
             s |= 0b1000;
         }
         // move new state in
@@ -112,12 +122,17 @@ where
     #[cfg(feature = "table-decoder")]
     /// Call `update` to evaluate the next state of the encoder, propagates errors from `InputPin` read
     pub fn update(&mut self) -> Result<Direction, Either<A::Error, B::Error>> {
+        #[cfg(not(feature = "embedded-hal-alpha"))]
+        let (a_is_high, b_is_high) = (self.pin_a.is_high(), self.pin_b.is_low());
+        #[cfg(feature = "embedded-hal-alpha")]
+        let (a_is_high, b_is_high) = (self.pin_a.try_is_high(), self.pin_b.try_is_low());
+
         // Implemented after https://www.best-microcontroller-projects.com/rotary-encoder.html
         self.prev_next <<= 2;
-        if self.pin_a.is_high().map_err(Either::Left)? {
+        if a_is_high.map_err(Either::Left)? {
             self.prev_next |= 0x02;
         }
-        if self.pin_b.is_high().map_err(Either::Right)? {
+        if b_is_high.map_err(Either::Right)? {
             self.prev_next |= 0x01;
         }
         self.prev_next &= 0x0f;
