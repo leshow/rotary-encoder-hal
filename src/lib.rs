@@ -119,6 +119,11 @@ where
         &mut self.pin_b
     }
 
+    /// Consumes this `Rotary`, returning the underlying pins `A` and `B`.
+    pub fn into_inner(self) -> (A, B) {
+        (self.pin_a, self.pin_b)
+    }
+
     #[cfg(feature = "table-decoder")]
     /// Call `update` to evaluate the next state of the encoder, propagates errors from `InputPin` read
     pub fn update(&mut self) -> Result<Direction, Either<A::Error, B::Error>> {
