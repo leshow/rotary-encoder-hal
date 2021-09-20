@@ -17,7 +17,7 @@ use either::Either;
 use embedded_hal::digital::v2::InputPin;
 
 #[cfg(feature = "embedded-hal-alpha")]
-use embedded_hal_alpha::digital::InputPin;
+use embedded_hal_alpha::digital::blocking::InputPin;
 
 /// Holds current/old state and both [`InputPin`](https://docs.rs/embedded-hal/0.2.3/embedded_hal/digital/v2/trait.InputPin.html)
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -130,7 +130,7 @@ where
         #[cfg(not(feature = "embedded-hal-alpha"))]
         let (a_is_high, b_is_high) = (self.pin_a.is_high(), self.pin_b.is_low());
         #[cfg(feature = "embedded-hal-alpha")]
-        let (a_is_high, b_is_high) = (self.pin_a.try_is_high(), self.pin_b.try_is_low());
+        let (a_is_high, b_is_high) = (self.pin_a.is_high(), self.pin_b.is_low());
 
         // Implemented after https://www.best-microcontroller-projects.com/rotary-encoder.html
         self.prev_next <<= 2;
