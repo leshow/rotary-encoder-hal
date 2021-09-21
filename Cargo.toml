@@ -20,7 +20,7 @@ optional = true
 
 [dependencies.embedded-hal-alpha]
 package  = "embedded-hal"
-version  = "=1.0.0-alpha.4"
+version  = "=1.0.0-alpha.5"
 optional = true
 
 [dev-dependencies]
