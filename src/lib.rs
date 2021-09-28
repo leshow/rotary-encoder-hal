@@ -95,7 +95,7 @@ where
         #[cfg(not(feature = "embedded-hal-alpha"))]
         let (a_is_low, b_is_low) = (self.pin_a.is_low(), self.pin_b.is_low());
         #[cfg(feature = "embedded-hal-alpha")]
-        let (a_is_low, b_is_low) = (self.pin_a.try_is_low(), self.pin_b.try_is_low());
+        let (a_is_low, b_is_low) = (self.pin_a.is_low(), self.pin_b.is_low());
 
         // move in the new state
         if a_is_low.map_err(Either::Left)? {
