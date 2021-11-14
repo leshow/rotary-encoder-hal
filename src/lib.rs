@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/rotary-encoder-hal/0.4.0")]
+#![doc(html_root_url = "https://docs.rs/rotary-encoder-hal/0.5.0")]
 //! # rotary-encoder-hal
 //!
 //! A platform agnostic rotary encoder library
