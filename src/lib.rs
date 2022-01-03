@@ -119,6 +119,11 @@ where
         &mut self.pin_b
     }
 
+    /// Returns a reference to both pins. Can be used to clear interrupt.
+    pub fn pins(&mut self) -> (&mut A, &mut B) {
+        (&mut self.pin_a, &mut self.pin_b)
+    }
+
     /// Consumes this `Rotary`, returning the underlying pins `A` and `B`.
     pub fn into_inner(self) -> (A, B) {
         (self.pin_a, self.pin_b)
