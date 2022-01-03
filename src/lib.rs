@@ -133,9 +133,9 @@ where
     /// Call `update` to evaluate the next state of the encoder, propagates errors from `InputPin` read
     pub fn update(&mut self) -> Result<Direction, Either<A::Error, B::Error>> {
         #[cfg(not(feature = "embedded-hal-alpha"))]
-        let (a_is_high, b_is_high) = (self.pin_a.is_high(), self.pin_b.is_low());
+        let (a_is_high, b_is_high) = (self.pin_a.is_high(), self.pin_b.is_high());
         #[cfg(feature = "embedded-hal-alpha")]
-        let (a_is_high, b_is_high) = (self.pin_a.is_high(), self.pin_b.is_low());
+        let (a_is_high, b_is_high) = (self.pin_a.is_high(), self.pin_b.is_high());
 
         // Implemented after https://www.best-microcontroller-projects.com/rotary-encoder.html
         self.prev_next <<= 2;
