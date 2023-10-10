@@ -25,13 +25,7 @@ use embedded_hal_alpha::digital::blocking::InputPin;
 pub struct Rotary<A, B> {
     pin_a: A,
     pin_b: B,
-    #[cfg(not(feature = "table-decoder"))]
     state: u8,
-
-    #[cfg(feature = "table-decoder")]
-    prev_next: u8,
-    #[cfg(feature = "table-decoder")]
-    store: u16,
 }
 
 /// The encoder direction is either `Clockwise`, `CounterClockwise`, or `None`
@@ -58,9 +52,9 @@ impl From<u8> for Direction {
 }
 
 #[cfg(feature = "table-decoder")]
-impl From<u16> for Direction {
-    fn from(s: u16) -> Self {
-        match s & 0x00ff {
+impl From<u8> for Direction {
+    fn from(s: u8) -> Self {
+        match s {
             0x17 => Direction::CounterClockwise,
             0x2b => Direction::Clockwise,
             _ => Direction::None,
@@ -78,13 +72,7 @@ where
         Self {
             pin_a,
             pin_b,
-            #[cfg(not(feature = "table-decoder"))]
             state: 0u8,
-
-            #[cfg(feature = "table-decoder")]
-            prev_next: 0u8,
-            #[cfg(feature = "table-decoder")]
-            store: 0u16,
         }
     }
 
@@ -134,25 +122,28 @@ where
         let (a_is_high, b_is_high) = (self.pin_a.is_high(), self.pin_b.is_high());
 
         // Implemented after https://www.best-microcontroller-projects.com/rotary-encoder.html
-        self.prev_next <<= 2;
+        let mut prev_next = (self.state << 2) & 0xF;
         if a_is_high.map_err(Either::Left)? {
-            self.prev_next |= 0x01;
+            prev_next |= 0x01;
         }
         if b_is_high.map_err(Either::Right)? {
-            self.prev_next |= 0x02;
+            prev_next |= 0x02;
         }
-        self.prev_next &= 0x0f;
 
-        match self.prev_next {
+        match prev_next {
             /*valid cases*/
             1 | 2 | 4 | 7 | 8 | 11 | 13 | 14 => {
-                self.store <<= 4;
-                self.store |= self.prev_next as u16;
+                let result = (self.state & 0xF0) | prev_next;
+                self.state = prev_next << 4 | prev_next;
 
-                Ok(self.store.into())
+                Ok(result.into())
             }
             /*Invalid cases */
-            0 | 3 | 5 | 6 | 9 | 10 | 12 | 15 => Ok(Direction::None),
+            0 | 3 | 5 | 6 | 9 | 10 | 12 | 15 => {
+                self.state = self.state & 0xF0 | prev_next;
+
+                Ok(Direction::None)
+            }
             /* let the compiler help us ensure we've covered them all */
             0x10..=0xFF => Ok(Direction::None),
         }
