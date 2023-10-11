@@ -25,6 +25,7 @@ use embedded_hal_alpha::digital::blocking::InputPin;
 pub struct Rotary<A, B> {
     pin_a: A,
     pin_b: B,
+    #[cfg(not(feature = "table-decoder"))]
     state: u8,
 
     #[cfg(feature = "table-decoder")]
@@ -60,8 +61,8 @@ impl From<u8> for Direction {
 impl From<u16> for Direction {
     fn from(s: u16) -> Self {
         match s & 0x00ff {
-            0x17 => Direction::Clockwise,
-            0x2b => Direction::CounterClockwise,
+            0x17 => Direction::CounterClockwise,
+            0x2b => Direction::Clockwise,
             _ => Direction::None,
         }
     }
@@ -77,6 +78,7 @@ where
         Self {
             pin_a,
             pin_b,
+            #[cfg(not(feature = "table-decoder"))]
             state: 0u8,
 
             #[cfg(feature = "table-decoder")]
@@ -92,9 +94,6 @@ where
         // use mask to get previous state value
         let mut s = self.state & 0b11;
 
-        #[cfg(not(feature = "embedded-hal-alpha"))]
-        let (a_is_low, b_is_low) = (self.pin_a.is_low(), self.pin_b.is_low());
-        #[cfg(feature = "embedded-hal-alpha")]
         let (a_is_low, b_is_low) = (self.pin_a.is_low(), self.pin_b.is_low());
 
         // move in the new state
@@ -132,23 +131,19 @@ where
     #[cfg(feature = "table-decoder")]
     /// Call `update` to evaluate the next state of the encoder, propagates errors from `InputPin` read
     pub fn update(&mut self) -> Result<Direction, Either<A::Error, B::Error>> {
-        #[cfg(not(feature = "embedded-hal-alpha"))]
-        let (a_is_high, b_is_high) = (self.pin_a.is_high(), self.pin_b.is_high());
-        #[cfg(feature = "embedded-hal-alpha")]
         let (a_is_high, b_is_high) = (self.pin_a.is_high(), self.pin_b.is_high());
 
         // Implemented after https://www.best-microcontroller-projects.com/rotary-encoder.html
         self.prev_next <<= 2;
         if a_is_high.map_err(Either::Left)? {
-            self.prev_next |= 0x02;
+            self.prev_next |= 0x01;
         }
         if b_is_high.map_err(Either::Right)? {
-            self.prev_next |= 0x01;
+            self.prev_next |= 0x02;
         }
         self.prev_next &= 0x0f;
 
         match self.prev_next {
-            /*Invalid cases 0 | 3 | 5 | 6 | 9 | 10 | 12 | 15=>, */
             /*valid cases*/
             1 | 2 | 4 | 7 | 8 | 11 | 13 | 14 => {
                 self.store <<= 4;
@@ -156,7 +151,10 @@ where
 
                 Ok(self.store.into())
             }
-            _ => Ok(Direction::None),
+            /*Invalid cases */
+            0 | 3 | 5 | 6 | 9 | 10 | 12 | 15 => Ok(Direction::None),
+            /* let the compiler help us ensure we've covered them all */
+            0x10..=0xFF => Ok(Direction::None),
         }
     }
 }

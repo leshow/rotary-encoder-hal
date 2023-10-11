@@ -25,14 +25,6 @@ optional = true
 
 [dev-dependencies]
 version-sync = "0.9"
-cortex-m = "0.6"
-cortex-m-rt = "0.6"
-panic-semihosting = "0.5"
-cortex-m-semihosting = "0.3"
-
-[dev-dependencies.stm32f3xx-hal]
-version = "0.5.0"
-features = [ "rt", "stm32f303" ]
 
 [features]
 default = []
