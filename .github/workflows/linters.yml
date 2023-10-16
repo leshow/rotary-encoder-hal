@@ -20,8 +20,12 @@ jobs:
           toolchain: ${{matrix.toolchain}}
           override: true
 
-      - name: Run cargo build
-        run: cargo build -v
+      - name: Run cargo test
+        run: |
+          cargo test -v
+          cargo test -v --features table-decoder
+          cargo test -v --features embedded-hal-alpha
+          cargo test -v --features table-decoder,embedded-hal-alpha
 
   doc:
     name: doc
