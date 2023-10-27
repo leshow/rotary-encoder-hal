@@ -22,10 +22,11 @@ use embedded_hal_alpha::digital::blocking::InputPin;
 /// Holds current/old state and both [`InputPin`](https://docs.rs/embedded-hal/0.2.3/embedded_hal/digital/v2/trait.InputPin.html)
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-pub struct Rotary<A, B> {
+pub struct Rotary<A, B, P> {
     pin_a: A,
     pin_b: B,
     state: u8,
+    phase: P,
 }
 
 /// The encoder direction is either `Clockwise`, `CounterClockwise`, or `None`
@@ -40,9 +41,22 @@ pub enum Direction {
     None,
 }
 
+/// Allows customizing which Quadrature Phases should be considered movements
+/// and in which direction or ignored.
+pub trait Phase {
+    /// Given the current state `s`, return the direction.
+    fn direction(&mut self, s: u8) -> Direction;
+}
+
+/// Default implementation of `Phase`.
+pub struct DefaultPhase;
+
 #[cfg(not(feature = "table-decoder"))]
-impl From<u8> for Direction {
-    fn from(s: u8) -> Self {
+/// The useful values of `s` are:
+/// - 0b0001 | 0b0111 | 0b1000 | 0b1110
+/// - 0b0010 | 0b0100 | 0b1011 | 0b1101
+impl Phase for DefaultPhase {
+    fn direction(&mut self, s: u8) -> Direction {
         match s {
             0b0001 | 0b0111 | 0b1000 | 0b1110 => Direction::Clockwise,
             0b0010 | 0b0100 | 0b1011 | 0b1101 => Direction::CounterClockwise,
@@ -52,8 +66,11 @@ impl From<u8> for Direction {
 }
 
 #[cfg(feature = "table-decoder")]
-impl From<u8> for Direction {
-    fn from(s: u8) -> Self {
+/// The useful values of `s` are:
+/// - 0x17 | 0x7E | 0xE8 | 0x81
+/// - 0x2B | 0xBD | 0xD4 | 0x42
+impl Phase for DefaultPhase {
+    fn direction(&mut self, s: u8) -> Direction {
         match s {
             0x17 => Direction::CounterClockwise,
             0x2b => Direction::Clockwise,
@@ -62,7 +79,7 @@ impl From<u8> for Direction {
     }
 }
 
-impl<A, B> Rotary<A, B>
+impl<A, B> Rotary<A, B, DefaultPhase>
 where
     A: InputPin,
     B: InputPin,
@@ -73,6 +90,23 @@ where
             pin_a,
             pin_b,
             state: 0u8,
+            phase: DefaultPhase,
+        }
+    }
+}
+
+impl<A, B, P: Phase> Rotary<A, B, P>
+where
+    A: InputPin,
+    B: InputPin,
+{
+    /// Accepts two [`InputPin`](https://docs.rs/embedded-hal/0.2.3/embedded_hal/digital/v2/trait.InputPin.html)s, these will be read on every `update()`, while using `phase` to determine the direction.
+    pub fn with_phase(pin_a: A, pin_b: B, phase: P) -> Self {
+        Self {
+            pin_a,
+            pin_b,
+            state: 0u8,
+            phase,
         }
     }
 
@@ -93,7 +127,7 @@ where
         }
         // move new state in
         self.state = s >> 2;
-        Ok(s.into())
+        Ok(self.phase.direction(s))
     }
 
     /// Returns a reference to the first pin. Can be used to clear interrupt.
@@ -136,7 +170,7 @@ where
                 let result = (self.state & 0xF0) | prev_next;
                 self.state = prev_next << 4 | prev_next;
 
-                Ok(result.into())
+                Ok(self.phase.direction(result))
             }
             /*Invalid cases */
             0 | 3 | 5 | 6 | 9 | 10 | 12 | 15 => {
