@@ -5,6 +5,19 @@
 
 A simple, platform agnostic rotary encoder library.
 
+An alternate decoder algorithm that is more tolerant of
+noise is enabled by the Cargo feature `table-encoder`.  It
+follows the discussion of noisy decoding
+[here](https://www.best-microcontroller-projects.com/rotary-encoder.html).
+
+
+You can call `update` from an ISR. You may get many spurious
+interrupts from switch bounce, though the algorithm handles
+them appropriately. When polling `update`, a poll time of
+about 1 ms seems to work well.
+
+## Examples
+
 ```rust
 #![no_std]
 #![no_main]
@@ -53,5 +66,3 @@ fn main() -> ! {
     }
 }
 ```
-
-Alternatively, you can call `update` from an ISR.
