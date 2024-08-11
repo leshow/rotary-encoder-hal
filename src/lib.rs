@@ -14,7 +14,7 @@
 use either::Either;
 
 #[cfg(not(feature = "embedded-hal-alpha"))]
-use embedded_hal::digital::v2::InputPin;
+use embedded_hal::digital::InputPin;
 
 #[cfg(feature = "embedded-hal-alpha")]
 use embedded_hal_alpha::digital::blocking::InputPin;
