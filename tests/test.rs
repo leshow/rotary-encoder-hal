@@ -4,7 +4,7 @@ use proptest::prelude::*;
 use rotary_encoder_hal::{Direction, Rotary};
 
 #[cfg(not(feature = "embedded-hal-alpha"))]
-use embedded_hal::digital::v2::InputPin;
+use embedded_hal::digital::InputPin;
 
 #[cfg(feature = "embedded-hal-alpha")]
 use embedded_hal_alpha::digital::blocking::InputPin;
