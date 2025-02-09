@@ -11,16 +11,11 @@ readme = "README.md"
 repository = "https://github.com/leshow/rotary-encoder-hal"
 
 [dependencies]
-embedded-hal = { version = "1.0.0"}
+embedded-hal = { version = "1.0.0" }
 either = { version = "1.6", default-features = false }
 
 [dependencies.defmt]
-version  = "0.1.2"
-optional = true
-
-[dependencies.embedded-hal-alpha]
-package  = "embedded-hal"
-version  = "=1.0.0-alpha.5"
+version = "0.3.10"
 optional = true
 
 [dev-dependencies]

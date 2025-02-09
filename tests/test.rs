@@ -3,29 +3,27 @@ use std::cell::RefCell;
 use proptest::prelude::*;
 use rotary_encoder_hal::{Direction, Rotary};
 
-#[cfg(not(feature = "embedded-hal-alpha"))]
-use embedded_hal::digital::InputPin;
-
-#[cfg(feature = "embedded-hal-alpha")]
-use embedded_hal_alpha::digital::blocking::InputPin;
+use embedded_hal::digital::{ErrorKind, ErrorType, InputPin};
 
 struct FakeInputPin<I>(RefCell<I>);
 
-impl<I: Iterator<Item = u8>> InputPin for FakeInputPin<I> {
-    type Error = ();
+impl<I> ErrorType for FakeInputPin<I> {
+    type Error = ErrorKind;
+}
 
-    fn is_high(&self) -> Result<bool, Self::Error> {
+impl<I: Iterator<Item = u8>> InputPin for FakeInputPin<I> {
+    fn is_high(&mut self) -> Result<bool, Self::Error> {
         if let Some(pd) = self.0.borrow_mut().next() {
             return Ok(pd == 1);
         }
-        Err(())
+        Err(ErrorKind::Other)
     }
 
-    fn is_low(&self) -> Result<bool, Self::Error> {
+    fn is_low(&mut self) -> Result<bool, Self::Error> {
         if let Some(pd) = self.0.borrow_mut().next() {
             return Ok(pd == 0);
         }
-        Err(())
+        Err(ErrorKind::Other)
     }
 }
 
@@ -33,8 +31,8 @@ fn run(v_a: &[u8], v_b: &[u8], expected: &[Direction]) {
     assert_eq!(expected.len(), v_a.len());
     assert_eq!(expected.len(), v_b.len());
 
-    let f_a = FakeInputPin(RefCell::new(v_a.into_iter().cloned()));
-    let f_b = FakeInputPin(RefCell::new(v_b.into_iter().cloned()));
+    let f_a = FakeInputPin(RefCell::new(v_a.iter().cloned()));
+    let f_b = FakeInputPin(RefCell::new(v_b.iter().cloned()));
     let mut rotary = Rotary::new(f_a, f_b);
     for (i, &dir) in expected.iter().enumerate() {
         assert_eq!(dir, rotary.update().unwrap(), "index: {}", i);
