@@ -24,8 +24,7 @@ jobs:
         run: |
           cargo test -v
           cargo test -v --features table-decoder
-          cargo test -v --features embedded-hal-alpha
-          cargo test -v --features table-decoder,embedded-hal-alpha
+          cargo test -v --features table-decoder,defmt
 
   doc:
     name: doc
@@ -53,7 +52,7 @@ jobs:
 
     strategy:
       matrix:
-        toolchain: [stable, beta, nightly]
+        toolchain: [stable]
 
     steps:
       - uses: actions/checkout@v2
@@ -74,7 +73,7 @@ jobs:
 
     strategy:
       matrix:
-        toolchain: [stable, beta, nightly]
+        toolchain: [stable]
 
     steps:
       - uses: actions/checkout@v2

@@ -6,7 +6,7 @@
 A simple, platform agnostic rotary encoder library.
 
 An alternate decoder algorithm that is more tolerant of
-noise is enabled by the Cargo feature `table-encoder`.  It
+noise is enabled by the Cargo feature `table-decoder`.  It
 follows the discussion of noisy decoding
 [here](https://www.best-microcontroller-projects.com/rotary-encoder.html).
 
